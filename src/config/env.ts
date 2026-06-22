@@ -46,6 +46,13 @@ const envSchema = z.object({
   ESKIZ_FROM: z.string().default('4546'),
   // Set to "true" to send real SMS even in development mode (requires valid ESKIZ_TOKEN)
   SEND_REAL_SMS: z.enum(['true', 'false']).default('false').transform((v) => v === 'true'),
+
+  // AI assistant — local Qwen3 model served via Ollama (data never leaves the box)
+  AI_ENABLED: z.enum(['true', 'false']).default('true').transform((v) => v === 'true'),
+  AI_PROVIDER: z.string().default('ollama'),
+  AI_MODEL: z.string().default('qwen3:1.7b'),
+  OLLAMA_HOST: z.string().default('http://127.0.0.1:11434'),
+  AI_TIMEOUT_MS: z.coerce.number().default(60000),
 });
 
 const parsed = envSchema.safeParse(process.env);

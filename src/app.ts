@@ -49,6 +49,7 @@ import { mobileUserRoutes } from './features/mobile/mobile-users.routes';
 import { inquiryRoutes } from './features/inquiries/inquiries.routes';
 import { mobileInquiryRoutes } from './features/inquiries/mobile-inquiries.routes';
 import { auditRoutes, mobileActivityRoutes } from './features/audit/audit.routes';
+import { aiRoutes } from './features/ai/ai.routes';
 
 export async function buildApp(): Promise<FastifyInstance> {
   const app = Fastify({
@@ -111,6 +112,7 @@ export async function buildApp(): Promise<FastifyInstance> {
   await app.register(mobileInquiryRoutes, { prefix: '/api/mobile/inquiries' });
   await app.register(auditRoutes, { prefix: '/api/audit-logs' });
   await app.register(mobileActivityRoutes, { prefix: '/api/mobile/activity' });
+  await app.register(aiRoutes, { prefix: '/api/ai' });
 
   // Platform-admin routes
   await app.register(adminOrganizationRoutes, { prefix: '/api/admin/organizations' });
