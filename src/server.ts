@@ -1,8 +1,24 @@
 import { buildApp } from './app';
 import { env } from './config/env';
 import { verifySmtp } from './common/utils/mailer';
+import { runMigrations } from './db/migrate';
 
 async function main() {
+  // Keep the database schema in sync automatically on every boot. Idempotent —
+  // already-applied migrations are skipped, so pm2 restarts / redeploys stay safe.
+  // Disable with AUTO_MIGRATE=false to run `npm run db:migrate` manually instead.
+  if (env.AUTO_MIGRATE) {
+    try {
+      await runMigrations();
+    } catch (err) {
+      console.error(
+        '❌ Auto-migration failed — refusing to start with an out-of-date schema.',
+        err,
+      );
+      process.exit(1);
+    }
+  }
+
   const app = await buildApp();
   try {
     await app.listen({ port: env.PORT, host: '0.0.0.0' });

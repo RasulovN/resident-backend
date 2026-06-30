@@ -7,11 +7,23 @@ const envSchema = z.object({
   CORS_ORIGIN: z.string().default('http://localhost:5173'),
 
   DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
+  // Apply pending DB migrations automatically on server boot (idempotent).
+  // Set AUTO_MIGRATE=false to manage migrations manually via `npm run db:migrate`.
+  AUTO_MIGRATE: z
+    .enum(['true', 'false'])
+    .default('true')
+    .transform((v) => v === 'true'),
 
   JWT_ACCESS_SECRET: z.string().min(16),
   JWT_REFRESH_SECRET: z.string().min(16),
   ACCESS_TOKEN_TTL: z.coerce.number().default(900), // 15 min (seconds)
   REFRESH_TOKEN_TTL: z.coerce.number().default(60 * 60 * 24 * 30), // 30 days
+
+  // Seed — default platform super-admin (read from env, never hardcode in source)
+  SEED_ADMIN_EMAIL: z.string().email().default('admin@crm.local'),
+  SEED_ADMIN_PASSWORD: z.string().min(8).default('Admin12345'),
+  SEED_ADMIN_FIRST_NAME: z.string().default('Platform'),
+  SEED_ADMIN_LAST_NAME: z.string().default('Admin'),
 
   COOKIE_SECURE: z
     .enum(['true', 'false'])
@@ -35,7 +47,7 @@ const envSchema = z.object({
 
   // File uploads
   UPLOAD_DIR: z.string().default('./uploads'),
-  APP_URL: z.string().default('http://localhost:4000'),
+  APP_URL: z.string().default('http://localhost:4001'),
   // Public web (admin panel) URL — used to build links in emails (e.g. password reset).
   WEB_URL: z.string().default('http://localhost:5173'),
 

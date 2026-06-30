@@ -1,5 +1,6 @@
 import { eq } from 'drizzle-orm';
 import { db, pool } from './client';
+import { env } from '../config/env';
 import { hashPassword } from '../common/utils/password';
 import { ALL_STATIC_PERMISSIONS } from '../features/permissions/permissions.catalog';
 import { permissions, rolePermissions } from '../features/permissions/permissions.model';
@@ -70,24 +71,24 @@ async function seed() {
     }
   }
 
-  // 3. Platform super admin user
-  const adminEmail = 'admin@crm.local';
+  // 3. Platform super admin user — credentials come from env, not hardcoded.
+  const adminEmail = env.SEED_ADMIN_EMAIL;
   let admin = await db.query.users.findFirst({ where: eq(users.email, adminEmail) });
   if (!admin) {
     [admin] = await db
       .insert(users)
       .values({
         email: adminEmail,
-        passwordHash: await hashPassword('Admin12345'),
-        firstName: 'Platform',
-        lastName: 'Admin',
+        passwordHash: await hashPassword(env.SEED_ADMIN_PASSWORD),
+        firstName: env.SEED_ADMIN_FIRST_NAME,
+        lastName: env.SEED_ADMIN_LAST_NAME,
         status: 'active',
         emailVerified: true,
         isPlatformAdmin: true,
       })
       .returning();
     // eslint-disable-next-line no-console
-    console.log(`   created platform admin: ${adminEmail} / Admin12345`);
+    console.log(`   created platform admin: ${adminEmail} (password from SEED_ADMIN_PASSWORD)`);
   }
 
   // 4. Platform "Super Admin" role with all platform permissions
