@@ -34,6 +34,13 @@ export async function verifyEmailHandler(request: FastifyRequest, reply: Fastify
   return reply.send(ok({ verified: true }));
 }
 
+export async function resendVerificationHandler(request: FastifyRequest, reply: FastifyReply) {
+  const { email } = forgotPasswordSchema.parse(request.body);
+  const result = await authService.resendVerification(email);
+  // Always respond the same way (do not reveal whether the email exists / is pending).
+  return reply.send(ok({ sent: true, ...(result.devToken ? { devToken: result.devToken } : {}) }));
+}
+
 export async function loginHandler(request: FastifyRequest, reply: FastifyReply) {
   const body = loginSchema.parse(request.body);
   const { user, accessToken, refreshToken } = await authService.login(body, ctxFrom(request));
