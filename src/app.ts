@@ -63,7 +63,14 @@ export async function buildApp(): Promise<FastifyInstance> {
   });
 
   await app.register(helmet, { crossOriginResourcePolicy: { policy: 'cross-origin' } });
-  await app.register(cors, { origin: corsOrigins, credentials: true });
+  await app.register(cors, {
+    origin: corsOrigins,
+    credentials: true,
+    // Must list every method the API uses, otherwise the browser CORS preflight
+    // rejects PATCH/PUT/DELETE (e.g. admin user update/delete) with
+    // "Method X is not allowed by Access-Control-Allow-Methods".
+    methods: ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  });
   await app.register(cookie);
   await app.register(multipart, { limits: { fileSize: 5 * 1024 * 1024 } });
   await app.register(rateLimit, { max: 200, timeWindow: '1 minute' });
