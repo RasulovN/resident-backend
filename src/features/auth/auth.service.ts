@@ -90,6 +90,18 @@ export async function verifyEmail(token: string) {
   });
 }
 
+// Re-send the email-verification link for an account that is still pending.
+// Mirrors forgotPassword's privacy stance: never reveal whether the email exists
+// or its verification state — always respond the same way to the caller.
+export async function resendVerification(email: string): Promise<{ devToken?: string }> {
+  const user = await db.query.users.findFirst({ where: eq(users.email, email) });
+  if (!user || user.emailVerified || user.status !== 'pending') return {};
+
+  const token = await issueVerificationEmail(user.id, user.email);
+  // In development expose the token so the flow can be tested without real SMTP.
+  return env.NODE_ENV === 'development' ? { devToken: token } : {};
+}
+
 export async function login(input: LoginInput, ctx: TokenContext) {
   const user = await db.query.users.findFirst({ where: eq(users.email, input.email) });
   if (!user) throw AppError.unauthorized('Invalid credentials');

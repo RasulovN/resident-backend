@@ -10,6 +10,7 @@ export async function authRoutes(app: FastifyInstance) {
 
   app.post('/register', authLimit, c.registerHandler);
   app.post('/verify-email', c.verifyEmailHandler);
+  app.post('/resend-verification', authLimit, c.resendVerificationHandler);
   app.post('/login', authLimit, c.loginHandler);
   app.post('/refresh', c.refreshHandler);
   app.post('/logout', c.logoutHandler);
