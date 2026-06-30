@@ -71,7 +71,7 @@ async function seed() {
     }
   }
 
-  // 3. Platform super admin user — credentials come from env, not hardcoded.
+  // 3. Platform super admin user — credentials come from env, not hardcoded. 11
   const adminEmail = env.SEED_ADMIN_EMAIL;
   let admin = await db.query.users.findFirst({ where: eq(users.email, adminEmail) });
   if (!admin) {
